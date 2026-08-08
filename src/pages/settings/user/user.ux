@@ -105,7 +105,7 @@ export default {
     }
   },
   async refreshAuth(){
-    let verifyUrl = 'https://api.b4qaq.cn/api/v2/verifyCheck/' + `WearPost?data=${encodeURIComponent(`${this.info.product}.${this.info.deviceId}.${this.info.serial}.${Math.floor(Date.now() / 1000)}`)}`;
+    let verifyUrl = 'https://api.b4qaq.cn/api/v2/verifyCheck/' + `ResonaUI?data=${encodeURIComponent(`${this.info.product}.${this.info.deviceId}.${this.info.serial}.${Math.floor(Date.now() / 1000)}`)}`;
     try{
       console.log('[验证] 请求 URL:', verifyUrl);
       const Req = await global.fetchManager.sendFetch(verifyUrl, false);

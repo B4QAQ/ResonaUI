@@ -127,7 +127,7 @@ WARNING:此页仅适配使用MingChengAPI验证服务进行的快应用激活操
       this.startCount();
     },
     refreshCode(){
-      this.buildURL = `WearPost?data=${encodeURIComponent(`${this.devinfo.product}.${this.devinfo.deviceId}.${this.devinfo.serial}.${Math.floor(Date.now() / 1000)}`)}`;
+      this.buildURL = `ResonaUI?data=${encodeURIComponent(`${this.devinfo.product}.${this.devinfo.deviceId}.${this.devinfo.serial}.${Math.floor(Date.now() / 1000)}`)}`;
     },
     async checkstatus(type = 'check'){
       let verifyUrl = 'https://api.b4qaq.cn/api/v2/verifyCheck/' + this.buildURL 

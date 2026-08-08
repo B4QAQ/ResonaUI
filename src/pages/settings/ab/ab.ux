@@ -22,39 +22,35 @@
             <div class='jcsb center'>
               <img src="/common/logo.png" style="width:72px" class="img-sty"></img>
               <div class='fd' style="color: black">
-                <text class="fs28">WearPost</text>
-                <text style="font-size:40px">腕上信驿</text>
+                <text class="fs28">xxxx</text>
+                <text style="font-size:40px">xxxx</text>
               </div>
             </div>
-            <text class="center" style="color: black;padding-top: 30px;">公测版</text>
+            <text class="center" style="color: black;padding-top: 30px;">xxxx</text>
           </div>
           <div class="info-box">
-            <text class="ab-title">WearPost</text>
+            <text class="ab-title">xxxx</text>
             <text class="ab-text">{{devinfo.versionName}}</text>
           </div>
           <div class="info-box">
             <text class="ab-title">版本代号</text>
-            <text class="ab-text">BETA</text>
-          </div>
-          <div class="info-box">
-            <text class="ab-title">API版本</text>
-            <text class="ab-text">V2.8.8</text>
+            <text class="ab-text">xxxx</text>
           </div>
           <div class="info-box" style="flex-direction: column">
             <text class="ab-title">开发人员名单</text>
-            <text class="ab-text">@B4QAQ</text>
+            <text class="ab-text">@xxxx</text>
             <text class="ab-2text">-应用制作</text>
           </div>
           <div class="info-box" style="flex-direction: column">
             <text class="ab-title">特别鸣谢</text>
-            <text class="ab-text">@Zaona</text>
-            <text class="ab-text">@淘汰郎</text>
+            <text class="ab-text">@xxxx</text>
+            <text class="ab-text">@xxxx</text>
             <text class="ab-2text center" style="margin-top:20px;margin-left:0px;">向以上大佬表示诚挚的感谢</text>
           </div>
           <div class="info-box" style="flex-direction: column">
             <text class="ab-title">测试人员</text>
-            <text class="ab-text">@愿为星萤照夜行(RW6)</text>
-            <text class="ab-text">@小周(9P/RW5)</text>
+            <text class="ab-text">@xxxx</text>
+            <text class="ab-text">@xxxx</text>
             <text class="ab-2text center" style="margin-top:20px;margin-left:0px;">感谢以上测试人员的努力，帮助应用变得更好</text>
           </div>
           <div class="info-box" style="flex-direction: row" @click="route('settings/settingslist',{title: '编译信息'})">

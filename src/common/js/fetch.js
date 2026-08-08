@@ -30,7 +30,7 @@ export async function sendFetch(url, isapi = true, parameter = {}) {
   const requestConfig = { timeout: 10000 }
 
   if (isapi) {
-    requestConfig.url = `https://api.b4qaq.cn/api/v2${url}/WearPost`
+    requestConfig.url = `https://api.b4qaq.cn/api/v2${url}/ResonaUI`
     requestConfig.method = 'POST'
     requestConfig.data = { ...parameter, Key: global.APIKey }
   } else {

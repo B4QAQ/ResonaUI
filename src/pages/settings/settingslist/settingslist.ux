@@ -65,7 +65,7 @@ export default {
       { title: '使用文档', lore: '[QR:https://docs.b4qaq.cn,扫码后查看]', type: 'help', val: false},
     ],
     licence:[
-      { title: 'NEORUAA/Vela_input_method', lore: '[QR:https://docs.b4qaq.cn,MIT]', type: 'help', val: false},
+      { title: 'NEORUAA/Vela_input_method', lore: '[QR:https://github.com/NEORUAA/Vela_input_method,MIT]', type: 'help', val: false},
       // 如你所见,ResonaUI的help设置项支持解析自定义格式的文本，并转换到Vela支持的组件，如[QR:这里放URL,这里放简要介绍]或[IMG:这里放URL,这里放简要介绍]
     ],
     build:[
