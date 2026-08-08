@@ -1,0 +1,166 @@
+<!--
+WARNING:此页仅适配使用MingChengAPI验证服务进行的快应用授权操作,如使用其他方式,请对此页面进行重写！
+WARNING:此页仅适配使用MingChengAPI验证服务进行的快应用授权操作,如使用其他方式,请对此页面进行重写！
+WARNING:此页仅适配使用MingChengAPI验证服务进行的快应用授权操作,如使用其他方式,请对此页面进行重写！
+-->
+<template>
+  <div class="container-compact">
+    <div class="header-compact">
+      <div if="{{global.Screen.screenShape != 'rect'}}">
+        <text class="time" style="transform: rotate(-16deg);margin-top:4px">{{ NowTime[0] }}</text>
+        <text class="time" style="transform: rotate(-8deg)">{{ NowTime[1] }}</text>
+        <text class="time" style="margin-top:-6px">:</text>
+        <text class="time" style="transform: rotate(8deg)">{{ NowTime[3] }}</text>
+        <text class="time" style="transform: rotate(16deg);margin-top:4px">{{ NowTime[4] }}</text>
+      </div>
+      <div class="center">
+          <img src="/common/others/back.png" class="img-sty h24" />
+          <text style="color: white;font-size: 32px;" @click="back()">授权信息</text>
+      </div>
+      <text if="{{global.Screen.screenShape == 'rect'}}" class="title">{{NowTime}}</text>
+    </div>
+    
+    <!-- User --> 
+    <div class="full-area {{scrclass}} center" style="margin-top: 10px;width:90%;color: white;">
+      <scroll scroll-y="true" class="full-area center">
+        <div class="about center mh">
+          <img src="/common/others/ab-api.png" style="width:120px" class="img-sty"></img>
+          <text style="color: black;padding-top: 30px;" if="{{info.type == 'none'}}">无网络,无法获取数据</text>
+          <text style="color: black;padding-top: 30px;" else>已授权 | {{info.type}}</text>
+        </div>
+        <div class="info-box" style="width: 100%;flex-direction: column">
+          <div style="width:100%;justify-content: space-between;">
+            <text>请求用量</text>
+            <text class="ab-2text">{{reqinfo.result.UseRequests}}/{{reqinfo.result.ALLRequests}}</text>
+          </div>
+          <progress class="p1" percent="{{(reqinfo.result.UseRequests / reqinfo.result.ALLRequests) * 100}}"></progress> 
+        </div>
+      <div class="info-box" style="width: 100%;flex-direction: column" @click="showKey()">
+        <div style="width:100%;justify-content: space-between;">
+          <text>APIKey</text>
+          <text class="ab-2text">{{ key == '************************' ? '点击以显示' : '点击以隐藏' }}</text>
+        </div>
+        <text>{{key}}</text>
+        <text if="{{reqinfo.result.userType != 'free'}}" class="ab-2text" style="color:red;">请勿将APIKey展示给他人,以防APIKey盗用</text>
+        <text else class="ab-2text" style="color:red;">您正在使用[免费版],如果觉得好用可以付费支持一下,十分感谢!</text>
+      </div>
+      <div class="info-box" style="width: 100%;flex-direction: column">
+        <text class="ab-title">设备信息</text>
+        <text class="ab-2text">设备代号</text>
+        <text class="ab-text">{{info['product']}}</text>
+        <text class="ab-2text" style="margin-top:20px">设备类型</text>
+        <text class="ab-text">{{info['deviceType']}}</text>
+        <text class="ab-2text" style="margin-top:20px">屏幕类型</text>
+        <text class="ab-text">{{info['screenShape']}}</text>
+        <text class="ab-2text" style="margin-top:20px">设备ID</text>
+        <text class="ab-text">{{info['deviceId']}}</text>
+        <text class="ab-2text" style="margin-top:20px">设备唯一ID/序列号</text>
+        <text class="ab-text">{{info['serial']}}</text>
+      </div>
+      <div class="info-box wd100 fd" @click="refreshAuth()">
+        <text class="ab-title" style="color: white;">刷新授权</text>
+        <text class="ab-2text" style="color: white;">获取最新的授权APIKey</text>
+      </div>
+      <div class="info-box wd100 fd" style="background-color: rgba(255, 0, 0, 0.3);" @click="revokeAuth()">
+        <text class="ab-title" style="color: white;">{{ delstatus == 1 ? '确认' : '' }}撤销授权</text>
+        <text class="ab-2text" style="color: white;">删除APIKey并重新初始化</text>
+      </div>
+      <div class='bottomzw'></div>
+    </scroll> 
+    </div>
+    <!-- User -->
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+import crypto from '@system.crypto'
+import { getDeviceInfo, getSettings } from '../../../common/js/useful.js'
+export default {
+  private: {
+    info: {},
+    reqinfo: {},
+    delstatus: 0,
+    key: '************************',
+    scrclass: '',
+    NowTime: '',
+  },
+  async showKey(){
+    if(this.key == '************************'){
+      this.key = global.APIKey || 'Unknow'
+    }else{
+      this.key = '************************'
+    }
+  },
+  async revokeAuth(){
+    if(this.delstatus == 1){
+      await global.storageManager.saveSettings({ APIKey: null });
+      global.uiAdm.MessageBox('授权已撤销，请重新初始化');
+      router.replace({ uri: '/pages/init' })
+      router.replace({ uri: '/pages/init' })
+      this.delstatus = 0
+    }else{
+      global.uiAdm.MessageBox('请再次点击确认');
+      this.delstatus = 1
+    }
+  },
+  async refreshAuth(){
+    let verifyUrl = 'https://api.b4qaq.cn/api/v2/verifyCheck/' + `WearPost?data=${encodeURIComponent(`${this.info.product}.${this.info.deviceId}.${this.info.serial}.${Math.floor(Date.now() / 1000)}`)}`;
+    try{
+      console.log('[验证] 请求 URL:', verifyUrl);
+      const Req = await global.fetchManager.sendFetch(verifyUrl, false);
+      if(Req.status == 200){
+        crypto.verify({
+          data: Req.result.APIKey,
+          algo: 'RSA-SHA256',
+          publicKey: `替换为你自己的publicKey`,
+          signature: Req.result.signature,
+          success: async (res) => {
+            try{
+              global.uiAdm.MessageBox('刷新成功')
+              await global.storageManager.saveSettings({APIKey: Req.result.APIKey})
+              await getSettings()
+              this.reqinfo =  await global.fetchManager.sendFetch('/getInfo')
+            }catch(e){
+              global.uiAdm.MessageBox(`[E09]签名验证失败,${JSON.stringify(e)}`)
+            }
+          },
+          fail: function(data, code) {
+            global.uiAdm.MessageBox(`[E10]签名验证失败,${code}`)
+          }
+        });
+      }else{
+        global.uiAdm.MessageBox(`[E${Req.status}]验证失败,${Req.result}`)
+      }
+    }catch(e){
+      global.uiAdm.MessageBox(`[E11]验证失败,${e.message || JSON.stringify(e)}`)
+    }
+  },
+  async onInit() {
+    global.uiAdm.registerPage(this.$page.name, this);
+    this.NowTime = global.NowHour + ':' + global.NowMin
+  },
+  onBackPress() { this.back();return true;},
+  onDestroy(){
+    global.uiAdm.unregisterPage(this.$page.name);
+  },
+  async onShow(){
+    this.info = await getDeviceInfo()
+    this.reqinfo =  await global.fetchManager.sendFetch('/getInfo')
+    if(this.reqinfo.status != 200){
+      global.uiAdm.MessageBox(this.reqinfo.result)
+    }
+  },
+}
+</script>
+
+<style>
+@import '../../../common/css/ab.css';
+@import '../../../common/css/loading.css';
+.ab-text .ab-2text{
+  margin-left:0px;
+}
+.ab-2text{
+  color: white;
+}
+</style>

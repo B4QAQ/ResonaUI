@@ -1,0 +1,117 @@
+<template>
+  <div class="container-compact">
+    <div class="header-compact">
+      <div if="{{global.Screen.screenShape != 'rect'}}">
+          <text class="time" style="transform: rotate(-16deg);margin-top:4px">{{ NowTime[0] }}</text>
+          <text class="time" style="transform: rotate(-8deg)">{{ NowTime[1] }}</text>
+          <text class="time" style="margin-top:-6px">:</text>
+          <text class="time" style="transform: rotate(8deg)">{{ NowTime[3] }}</text>
+          <text class="time" style="transform: rotate(16deg);margin-top:4px">{{ NowTime[4] }}</text>
+        </div>
+      <div class="center">
+            <img src="/common/others/back.png" class="img-sty h24" />
+            <text style="color: white;font-size: 32px;" @click="back()">关于</text>
+        </div>
+      <text if="{{global.Screen.screenShape == 'rect'}}" class="title">{{NowTime}}</text>
+    </div>
+    <!-- About -->
+    <div class='full-area center'>
+      <scroll scroll-y="true" class="full-area center {{scrclass}}" style="color: white;margin-top: 10px;">
+        <div style="width:90%;flex-direction: column;" >
+          <div class="about center mh">
+            <div class='jcsb center'>
+              <img src="/common/logo.png" style="width:72px" class="img-sty"></img>
+              <div class='fd' style="color: black">
+                <text class="fs28">WearPost</text>
+                <text style="font-size:40px">腕上信驿</text>
+              </div>
+            </div>
+            <text class="center" style="color: black;padding-top: 30px;">公测版</text>
+          </div>
+          <div class="info-box">
+            <text class="ab-title">WearPost</text>
+            <text class="ab-text">{{devinfo.versionName}}</text>
+          </div>
+          <div class="info-box">
+            <text class="ab-title">版本代号</text>
+            <text class="ab-text">BETA</text>
+          </div>
+          <div class="info-box">
+            <text class="ab-title">API版本</text>
+            <text class="ab-text">V2.8.8</text>
+          </div>
+          <div class="info-box" style="flex-direction: column">
+            <text class="ab-title">开发人员名单</text>
+            <text class="ab-text">@B4QAQ</text>
+            <text class="ab-2text">-应用制作</text>
+          </div>
+          <div class="info-box" style="flex-direction: column">
+            <text class="ab-title">特别鸣谢</text>
+            <text class="ab-text">@Zaona</text>
+            <text class="ab-text">@淘汰郎</text>
+            <text class="ab-2text center" style="margin-top:20px;margin-left:0px;">向以上大佬表示诚挚的感谢</text>
+          </div>
+          <div class="info-box" style="flex-direction: column">
+            <text class="ab-title">测试人员</text>
+            <text class="ab-text">@愿为星萤照夜行(RW6)</text>
+            <text class="ab-text">@小周(9P/RW5)</text>
+            <text class="ab-2text center" style="margin-top:20px;margin-left:0px;">感谢以上测试人员的努力，帮助应用变得更好</text>
+          </div>
+          <div class="info-box" style="flex-direction: row" @click="route('settings/settingslist',{title: '编译信息'})">
+            <text class="ab-title">编译信息</text>
+          </div>
+          <div class="info-box" style="flex-direction: row" @click="route('settings/settingslist',{title: '开放源代码许可'})">
+            <text class="ab-title">开放源代码许可</text>
+          </div>
+          <text class="ab-text center bottomzw" style="margin-left:0px;">{{foottext}}</text>
+        </div>
+      </scroll>
+    </div>
+    <!-- About -->
+  </div>
+</template>
+
+<script>
+import { getDeviceInfo } from '../../../common/js/useful.js'
+
+export default {
+  private: {
+
+    foottext: '',
+    devinfo: {},
+
+    scrclass: '',
+    NowTime: '',
+
+    Saying:[
+      'BugMI HyperBUG!',
+      '325799 懂得都懂',
+      '卫士不语功，唯时代尔',
+      'Ciallo～(∠・ω< )⌒☆',
+      '由 XiaomiVela 费力驱动',
+    ],
+  },
+
+  async onInit() {
+    global.uiAdm.registerPage(this.$page.name, this);
+    this.foottext = this.Saying[Math.floor(Math.random() * this.Saying.length)]
+    this.devinfo = await getDeviceInfo()
+    this.NowTime = global.NowHour + ':' + global.NowMin
+  },
+  onBackPress() { this.back(); return true; },
+  onDestroy(){
+    global.uiAdm.unregisterPage(this.$page.name);
+  },
+
+}
+</script>
+
+<style>
+@import '../../../common/css/ab.css';
+@import '../../../common/css/loading.css';
+@media (width < 180) {
+  .info-box{
+    flex-direction: column;
+  }
+}
+</style>

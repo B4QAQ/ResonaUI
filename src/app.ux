@@ -1,0 +1,182 @@
+<script>
+import router from "@system.router"
+import app from '@system.app'
+import * as uiAdm from './common/js/uiAdm'
+import { getDeviceInfo, getSettings } from './common/js/useful.js'
+import * as storageManager from "./common/js/storage.js"
+import * as fetchManager from "./common/js/fetch.js"
+import { initInterconnect } from './common/js/interconnect.js'
+
+export default {
+  timeUpdateTimer: null,
+
+  async onCreate() {
+    // 将常用模块挂载到 global
+    global.uiAdm = uiAdm
+    global.storageManager = storageManager
+    global.fetchManager = fetchManager
+
+    uiAdm.initAdm()
+    this.updateTime()
+    initInterconnect()
+    this.timeUpdateTimer = setInterval(() => this.updateTime(), 1000)
+    this.initializeApp()
+  },
+
+  async initializeApp() {
+    const device = await getDeviceInfo()
+    const set = await getSettings()
+    const indexPage = global.pagePool.get('pages/index')
+    if (!device) {
+      app.terminate()
+      return
+    }
+    await storageManager.init() 
+    // API Key 检查
+    if (!global.APIKey) {
+      router.replace({ uri: '/pages/init' })
+      return
+    }
+    if (global.NetworkStatus === 'none' || !global.fetchAva) {
+      return
+    }
+    // xxxx，这里可以使用indexPage.[对应页面的函数名称]做到无需跳转页面也能进行函数执行的操作（常用于后台刷新操作）
+
+    global.runGC()
+  },
+
+  updateTime() {
+    const now = new Date()
+    global.NowHour = now.getHours().toString().padStart(2, '0')
+    global.NowMin = now.getMinutes().toString().padStart(2, '0')
+    uiAdm.UpdateTime(global.NowHour + ':' + global.NowMin)
+  },
+
+  onDestroy() {
+    clearInterval(this.timeUpdateTimer)
+  }
+}
+</script>
+<style>
+/* 以下均为全局CSS,任何页面无需注册即可直接使用 */
+.container-compact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 432px;
+  height: 100%;
+  background-color: #000000;
+}
+.full-area {
+  flex-direction: column;
+  background-color: transparent;
+  width: 100%;
+  flex: 1;
+}
+.title {
+  font-size: 32px;
+  color: white;
+}
+.fs28 {
+  font-size: 28px;
+}
+.title-20px {
+  font-size: 25px;
+  color: #ffffff;
+}
+.font-mini-b {
+  color: #e2e2e2;
+  font-size: 24px;
+}
+.center {
+  text-align: center;
+  align-items: center;
+}
+.info-box {
+  flex-direction: row;
+  border-radius: 25px;
+  padding: 10px 10px;
+  margin-top: 6px;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+.r36 {
+  border-radius: 36px;
+}
+.img-sty {
+  object-fit: cover;
+}
+.h45 {
+  height: 45px;
+}
+.h24 {
+  height: 24px;
+}
+.h28 {
+  height: 28px;
+}
+.mgl6 {
+  margin-left: 6px;
+}
+.time {
+  width: 20px;
+  height: 34px;
+  font-size: 30px;
+  text-align: center;
+  color: #e2e2e2;
+  transform-origin: 10px 17px;
+}
+.fd {
+  flex-direction: column;
+}
+.fr {
+  flex-direction: row;
+}
+.wd{
+  width: 100%;
+}
+.wd100{
+  width: 100%;
+}
+.jcsb{
+  justify-content:space-between;
+}
+.header-compact {
+  padding-top: 10px;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+}
+.bottomzw{
+  height: 50px;
+}
+@media screen and (shape: pill-shaped) {
+  .header-compact {
+    margin-top: 15px;
+    flex-direction: column;
+  }
+}
+@media screen and (shape: circle) {
+  .header-compact {
+    flex-direction: column;
+  }
+  .wd{
+    width: 90%;
+  }
+  .bottomzw{
+    margin-top: 100px;
+  }
+}
+@media screen and (shape: rect) {
+  .header-compact {
+    justify-content: space-between;
+    padding-right: 60px;
+    padding-left: 46px;
+  }
+}
+@media (width: 160) {
+  .header-compact {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+}
+</style>

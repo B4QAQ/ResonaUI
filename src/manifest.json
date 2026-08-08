@@ -1,0 +1,96 @@
+{
+  "package": "moe.mcns.ResonaUI",
+  "name": "ResonaUI",
+  "versionName": "260724",
+  "versionCode": 7,
+  "minPlatformVersion": 1000,
+  "icon": "/common/logo.png",
+  "deviceTypeList": [
+    "watch"
+  ],
+  "features": [
+	{
+		"name": "system.router"
+	},
+	{
+		"name": "system.fetch"
+	},
+	{
+		"name": "system.storage"
+	},
+	{
+		"name": "system.file"
+	},
+	{
+		"name": "system.network"
+	},
+	{
+		"name": "system.geolocation"
+	},
+	{
+		"name": "system.device"
+	},
+	{
+		"name": "system.brightness"
+	},
+	{
+		"name": "system.vibrator"
+	},
+	{
+    	"name": "system.prompt"
+  	},
+	  {
+    	"name": "system.app"
+  	},
+	{
+		"name": "system.crypto"
+	},
+	{
+		"name": "system.request"
+	},
+	{
+		"name": "system.uploadtask"
+	},
+	{
+		"name": "system.audio"
+	},
+	{
+		"name": "system.interconnect"
+	}
+],
+  "config": {
+    "logLevel": "log",
+    "designWidth": "device-width"
+  },
+  "router": {
+    "entry": "pages/index",
+    "pages": {
+	"pages/index": {
+		"component": "index"
+	},
+	"pages/settings": {
+		"component": "settings"
+	},
+	"pages/settings/settingslist": {
+		"component": "settingslist"
+	},
+	"pages/settings/ab": {
+		"component": "ab"
+	},
+	"pages/settings/user": {
+		"component": "user"
+	},
+	"pages/init": {
+		"component": "init"
+	}
+}
+  },
+	"permissions": [
+	{
+		"name": "hapjs.permission.DEVICE_INFO"
+	},
+	{
+		"name": "hapjs.permission.LOCATION"
+	}
+]
+}

@@ -1,0 +1,49 @@
+<template>
+  <div class="container-compact">
+    <div class="header-compact">
+      <div class="center" @click="route('settings')">
+          <img src="/common/others/back.png" class="img-sty h28" />
+          <text class="title">主页</text>
+      </div>
+      <text if="{{global.Screen.screenShape == 'rect'}}" class="title">{{NowTime}}</text>
+    </div>
+    <div class='full-area center'>
+      <scroll scroll-y="true" bounces="true" class="{{scrclass}} full-area fd center" style="color: white;margin-top:10px;">
+        
+          <div class='bottomzw'></div>
+      </scroll>
+    </div>
+  </div>
+</template>
+
+<script>
+import { getSettings } from '../../common/js/useful';
+
+export default {
+  props: {
+    title: { default: '' },
+    haveCommand: { default: '' },
+  },
+  private: {
+    NowTime: null,
+    scrclass: '',
+    settings: null,
+  },
+
+  onInit() {
+    global.uiAdm.registerPage(this.$page.name, this);
+    this.NowTime = global.NowHour + ':' + global.NowMin;
+  },
+  onBackPress() { this.back(); return true; },
+  onDestroy() { global.uiAdm.unregisterPage(this.$page.name); },
+
+  async onShow() {
+    this.settings = await getSettings();
+  },
+}
+</script>
+
+<style>
+@import '../../common/css/list.css';
+@import '../../common/css/loading.css';
+</style>

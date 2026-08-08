@@ -1,0 +1,112 @@
+/******************************************************************************
+ * @file        loading.css
+ * @description 加载动画样式
+ * @author      B4QAQ
+ * @source      Eternal
+ * @version     Beta1.0
+ * @copyright   2025 B4QAQ@MCNS.
+ * @license     MPL-2.0-only
+ ******************************************************************************/
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.anim-spin {
+  object-fit: cover;
+  width: 60px;
+  height: 60px;
+  animation-name: spin;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  transform-origin: 30px 30px;
+}
+
+.mini {
+  width: 36px;
+  height: 36px;
+  transform-origin: 18px 18px;
+}
+
+/* 打开页面动画 - 从右侧滑入并缩小 */
+@keyframes openpage-scroll {
+  from {
+    transform: translateX(0px) scale(1);
+  }
+  to {
+    transform: translateX(500px) scale(0.75);
+  }
+}
+
+/* 从背面进入动画 - 从下方滑入并缩小 */
+@keyframes fromback-scroll {
+  from {
+    transform: translateY(232px) scale(1);
+  }
+  to {
+    transform: translateY(0px) scale(0.75);
+  }
+}
+
+/* 返回页面动画 - 从右侧滑入并缩小 */
+@keyframes backpage-scroll {
+  from {
+    transform: translateX(0px) scale(1);
+  }
+  to {
+    transform: translateX(500px) scale(0.75);
+  }
+}
+
+/* 打开页面时的滚动动画 */
+.scroll {
+  animation-name: openpage-scroll;
+  animation-timing-function: ease;
+  animation-duration: 500ms;
+  animation-direction: reverse;
+}
+
+/* 返回页面时的滚动动画 */
+.scroll-backanim {
+  animation-name: backpage-scroll;
+  animation-timing-function: ease;
+  animation-duration: 500ms;
+  animation-direction: normal;
+}
+
+/* 从背面进入的滚动动画 */
+.scroll-frombackanim {
+  animation-name: fromback-scroll;
+  animation-timing-function: ease;
+  animation-duration: 500ms;
+  animation-direction: reverse;
+}
+@keyframes prompt-cls {
+  from {
+    width:0%
+  }
+  to {
+    width:100%
+  }
+}
+
+.prompt-open {
+  animation-name: prompt-cls;
+  animation-timing-function: ease;
+  animation-duration: 500ms;
+  animation-fill-mode: forwards;
+}
+
+.prompt-close {
+  animation-name: prompt-cls;
+  animation-timing-function: ease;
+  animation-duration: 500ms;
+  animation-direction: reverse;
+  animation-fill-mode: forwards;
+}

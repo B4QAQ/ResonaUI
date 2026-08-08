@@ -1,0 +1,258 @@
+<!--
+WARNING:此页仅适配使用MingChengAPI验证服务进行的快应用激活操作,如使用其他方式,请对此页面进行重写！
+WARNING:此页仅适配使用MingChengAPI验证服务进行的快应用激活操作,如使用其他方式,请对此页面进行重写！
+WARNING:此页仅适配使用MingChengAPI验证服务进行的快应用激活操作,如使用其他方式,请对此页面进行重写！
+-->
+<template>
+    <div class="container-compact">
+      <div if="{{nowpage != 1}}" class="header-compact">
+        <text class="title">{{pagetitle}}</text>
+        <text class="title">{{nowpage}}/3</text>
+      </div>
+      <div class='full-area {{scrclass}}'>
+        <scroll scroll-y="true" class="full-area" id="mainsc">
+          <div style="padding: 20px;">
+            <!-- 第 1 页：隐私协议 -->
+            <div if="{{nowpage == 1}}" class="full-area center">
+              <!-- 第 1 页顶部 logo 和标题 -->
+                <img src="/common/others/licence.png" class="img-sty" style="height: 50px;width: 50px;margin-bottom: 20px;" />
+                <text class="title">{{pagetitle}}</text>
+              
+              <!-- 隐私政策标题 -->
+              <text class="title" style="margin-top: 20px;font-size: 29px">《xxx隐私政策》</text>
+              
+              <!-- 隐私政策内容 -->
+              <text class="title-20px" >{{licence}}</text>
+              
+              <!-- 声明 -->
+              <text class="title" style="margin-top: 20px;color: #008cff;">声明</text>
+                <text class="title-20px">
+                  不建议使用 AstroBox 为手表提供网络 (同步信息除外),推荐使用 [小米运动健康] 或使用 eSIM 进行网络连接，如果连接 AstroBox 使用时出现问题，请断开后使用
+                </text>
+                <text class="title-20px" style="color: #ff3333;">
+                  使用本应用前请保证您的设备存储空间充足，如果遇到无法写入问题，请重启设备或尝试清理存储空间后重试!
+                </text>
+              
+              <!-- Next 按钮 -->
+              <text class="info-box font-mini-b btn" @click="nextpage">下一步{{remainingTime > 0 ? '(' + remainingTime + 's)' : ''}}</text>
+            </div>
+            
+            <!-- 第 2 页：激活 -->
+            <div if="{{nowpage == 2}}" style='flex-direction: column;' class='center'>
+              <text class="title-20px" style="color: #ff3333;margin-bottom: 20px;">[!] 虚拟商品，不退不换!</text>
+              
+              <!-- 第 1 步：购买 -->
+              <div class="info-box center" style="margin-bottom: 20px">
+                <text class="title-20px" style="color: #0c84ff;text-align: left;width: 100%;margin-bottom: 10px;">购买应用</text>
+                <text class="font-mini-b" style="text-align: center;">扫描下方二维码进入爱发电购买</text>
+                <text class="font-mini-b" style="color: #ff9500;text-align: center;">购买后点击下方按钮</text>
+                <!-- 购买二维码 -->
+                <div style="background-color: white;border-radius: 25px;padding: 15px;margin-bottom: 10px;" @click="refreshCode()">
+                  <qrcode value="https://api.b4qaq.cn/api/v2/verify/{{buildURL}}" style="width: 80%;"></qrcode>
+                </div>
+                <text class="title-20px" style="color: #ff3333;margin-bottom: 20px;">若提示过期,请点击二维码刷新</text>
+                <text class="title-20px" style="color: #ff3333;margin-bottom: 20px;">[!] 联网验证，请确保网络畅通!</text>
+              </div>
+              <!-- Next 按钮 -->
+              <text class="info-box font-mini-b btn" @click="checkstatus()">下一步{{remainingTime > 0 ? '(' + remainingTime + 's)' : ''}}</text>
+            </div>
+            <!-- 第 5 页：操作提示 -->
+            <div if="{{nowpage == 3}}" class="full-area center">
+              <div class="info-box center" style="margin-bottom: 20px;width:100%">
+                <text class="title-20px" style="color: #0c84ff;">xxxx</text>
+                <text class="title-20px" style="color: #ff3333;">红字提示</text>
+                <text class="title-20px">普通提示</text>
+              </div>
+              <div class="info-box center" style="margin-bottom: 20px;width:100%">
+                <text class="title-20px" style="color: #0c84ff;margin-bottom: 20px">教学链接</text>
+                <!-- 教学二维码 -->
+                <div style="background-color: white;border-radius: 25px;padding: 15px;margin-bottom: 10px;" @click="refreshCode()">
+                  <qrcode value="https://docs.b4qaq.cn" style="width: 80%;"></qrcode>
+                </div>
+                <text class="title-20px">扫描上方二维码查看图片教学</text>
+              </div>
+              <text class="title-20px" style="color: #ff3333;margin-bottom: 20px;">[!] xxxx</text>
+              <text if="remainingTime > 0" style="color: #ff3333;">{{remainingTime}}s</text>
+              <div if="remainingTime <= 0" style="flex-direction: column" class="center">
+                <text class="info-box btn" style="margin-top:0px;" @click="route('index')">进入主页</text>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 底部留白 -->
+          <div style="height: 20px;"></div>
+        </scroll>
+      </div>
+    </div>
+  </template>
+  
+  <script>
+  import prompt from '@system.prompt'
+  import router from "@system.router"
+  import crypto from '@system.crypto'
+  import { getDeviceInfo, getSettings } from '../../common/js/useful.js'
+  export default {
+    private: {
+      info: 'Waitting...',
+      nowpage: 1,
+      fromset: false,
+      addinfo: null,
+      buildURL: null,
+      // 如果你不使用 Eternal 作为验证，请填入你自己应用的公钥和应用名
+      pubKey: `替换为您自己的publicKey（xxxx）`,
+      pagetitle: '请先同意协议',
+      licence: `请替换为您自己的协议[xxxx]`,
+      devinfo:null,
+      // 选中的布局
+      selectedLayout: '0',
+      isLoadingGeo: '定位中...',
+      pageStartTime: null,
+      remainingTime: 5,
+      scrclass: '',
+    },
+    onBackPress(){ this.back(); return true; },
+    async onInit() {
+      global.uiAdm.registerPage(this.$page.name, this);
+      console.log('[INFO] 初始化设置向导页');
+      this.devinfo = await getDeviceInfo()
+      this.pageStartTime = Date.now();
+      this.refreshCode()
+      console.log(this.buildURL)
+      if(this.nowpage != 1){
+        this.fromset = true
+        this.getGeo()
+        if(this.nowpage == 4) this.pagetitle = '定位城市'
+        else this.pagetitle = '操作提示'
+      }
+      this.startCount();
+    },
+    refreshCode(){
+      this.buildURL = `WearPost?data=${encodeURIComponent(`${this.devinfo.product}.${this.devinfo.deviceId}.${this.devinfo.serial}.${Math.floor(Date.now() / 1000)}`)}`;
+    },
+    async checkstatus(type = 'check'){
+      let verifyUrl = 'https://api.b4qaq.cn/api/v2/verifyCheck/' + this.buildURL 
+      if(type == 'free') verifyUrl = verifyUrl + '&type=free'
+      try{
+        console.log('[验证] 请求 URL:', verifyUrl);
+        const Req = await global.fetchManager.sendFetch(verifyUrl, false);
+        if(Req.status == 200){
+          crypto.verify({
+            data: Req.result.APIKey,
+            algo: 'RSA-SHA256',
+            publicKey: this.pubKey,
+            signature: Req.result.signature,
+            success: async (res) => {
+              try{
+                prompt.showToast({message: '验证成功',duration: 2000})
+                await global.storageManager.saveSettings(
+                  { APIKey: Req.result.APIKey},
+                  //请在此填入其他的初始化设置信息
+                )
+                await getSettings()
+                this.nextpage('true');
+              }catch(e){
+                prompt.showToast({message: `[E09]签名验证失败,${JSON.stringify(e)}`,duration: 2000})
+              }
+            },
+            fail: function(data, code) {
+              prompt.showToast({message: `[E10]签名验证失败,${code}`,duration: 2000})
+            }
+          });
+        }else{
+          prompt.showToast({message: `[E${Req.status}]验证失败,${Req.result}`,duration: 2000})
+        }
+      }catch(e){
+        prompt.showToast({message: `[E11]验证失败,${e.message || JSON.stringify(e)}`,duration: 2000})
+      }
+    },
+    route(pageName, params) {
+      router.replace({
+        uri: `/pages/${pageName}`,
+        params: params
+      })
+    },
+    nextpage(wait = 'false') {
+      console.log('[INFO] 切换到下一页，当前页面:', this.nowpage);
+      if (this.remainingTime > 0) {
+        console.log(`[INFO] 页面停留时间不足 5 秒，等待${this.remainingTime.toFixed(1)}秒`);
+      } else {
+        if(!global.fetchAva){
+          this.nowpage = 6;
+        }
+        this.nowpage++;
+        this.updatePageTitle();
+        if(wait == 'true'){
+          this.pageStartTime = Date.now();
+        }
+        this.remainingTime = 10;
+        this.startCount();
+      }
+    },
+    
+    startCount(){
+      if(this.countdownTimer) clearInterval(this.countdownTimer)
+      this.countdownTimer = setInterval(() => {
+        const currentTime = Date.now();
+        const elapsedTime = (currentTime - this.pageStartTime) / 1000;
+        this.remainingTime = Math.max(0, 10 - Math.floor(elapsedTime));
+        if (this.remainingTime <= 0) {
+          clearInterval(this.countdownTimer);
+        }
+      }, 1000);
+    },
+    onShow(){
+      this.startCount();
+    },
+    
+    updatePageTitle() {
+      switch(this.nowpage) {
+        case 1:
+          this.pagetitle = " 请先同意协议";
+          break;
+        case 2:
+          this.pagetitle = " 验证购买";
+          break;
+        case 3:
+          this.pagetitle = " 操作提示";
+          break;
+      }
+      this.$element('mainsc').scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto'
+      });
+    },
+    onDestroy() {
+      global.uiAdm.unregisterPage(this.$page.name);
+      if (this.countdownTimer) {
+        clearInterval(this.countdownTimer);
+      }
+    },
+  }
+  </script>
+  
+  <style>
+  @import '../../common/css/list.css';
+  @import '../../common/css/loading.css';
+  
+  .layout-selected {
+    border: 2px solid #0c84ff;
+  }
+  
+  .layout-unselected {
+    border: 2px solid transparent;
+  }
+  .info-box{
+    background-color: #2a2a2a
+  }
+  .btn {
+    padding: 12px 24px;
+    margin-top:20px;
+    color: white;
+    background-color:#0066cc;
+  }
+  .info-box{
+    flex-direction:column
+  }
+  </style>
+  

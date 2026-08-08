@@ -1,0 +1,74 @@
+<template>
+  <div class="container-compact">
+    <div class="header-compact">
+      <div if="{{global.Screen.screenShape != 'rect'}}">
+          <text class="time" style="transform: rotate(-16deg);margin-top:4px">{{ NowTime[0] }}</text>
+          <text class="time" style="transform: rotate(-8deg)">{{ NowTime[1] }}</text>
+          <text class="time" style="margin-top:-6px">:</text>
+          <text class="time" style="transform: rotate(8deg)">{{ NowTime[3] }}</text>
+          <text class="time" style="transform: rotate(16deg);margin-top:4px">{{ NowTime[4] }}</text>
+        </div>
+      <div class="center">
+          <img src="/common/others/back.png" class="img-sty h24" />
+          <text class="title" @click="back()">功能页</text>
+      </div>
+      <text if="{{global.Screen.screenShape == 'rect'}}" class="title">{{NowTime}}</text>
+    </div>
+    <!-- SET -->
+    <div class='full-area center'>
+      <scroll scroll-y="true" bounces="true" class="{{scrclass}} full-area center" style="color: white;margin-top:10px;">
+        <!-- 循环的功能项 -->
+          <div class="card-item jcsb" for="{{SetList}}" @click="{{route($item.page)}}">
+            <div class="fd">
+              <text class="card-title">{{$item.title}}</text>
+              <text if="{{global.Screen.screenShape != 'pill-shaped'}}" class="card-2title" style="padding: 2px 2px;">{{$item.lore}}</text>
+            </div>
+            <div class="center" style="height:100%">
+              <img src="/common/others/back.png" class="img-sty h24" style="transform: rotate(180deg);transform-origin: 12px 12px;" />
+            </div>
+          </div>
+          <div class='bottomzw'></div>
+      </scroll>
+    </div>
+    <!-- SET -->
+  </div>
+</template>
+
+<script>
+
+export default {
+  private: {
+    NowTime: null,
+    currentAccount: {},
+    SetList:[
+    { title: '主页', lore: '主页', page: 'index' },
+
+    { title: '偏好设置', lore: '主题/通知及通用设置', page: 'settings/settingslist?title=偏好设置' },
+    { title: '应用公告', lore: '查看最新动态与通知', page: 'settings/settingslist?title=应用公告' },
+    { title: '常见问题', lore: '帮助中心与使用指南', page: 'settings/settingslist?title=常见问题' },
+    { title: '授权信息', lore: '查看/撤销当前授权', page: 'settings/user' },
+    { title: '关于', lore: '关于本应用', page: 'settings/ab' }
+    ],
+    scrclass: '',
+  },
+  onInit() {
+    global.uiAdm.registerPage(this.$page.name, this);
+    this.NowTime = global.NowHour + ':' + global.NowMin
+    //这里可以使用fetchAva来为不支持Fetch的设备筛选出设置项，实现对功能的隐藏
+    if(!global.fetchAva){
+      this.SetList = this.SetList.filter(item => item.fetch === false);
+    }
+  },
+  async onShow() {
+  },
+  onBackPress() { this.back(); return true; },
+  onDestroy(){
+    global.uiAdm.unregisterPage(this.$page.name);
+  }
+}
+</script>
+
+<style>
+@import '../../common/css/list.css';
+@import '../../common/css/loading.css';
+</style>

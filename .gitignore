@@ -1,0 +1,33 @@
+# 依赖
+node_modules/
+
+# 构建产物
+/dist/
+/build/
+
+# 测试与覆盖率
+/.nyc_output
+/coverage
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+
+# OS 文件
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+/logs/
+
+# 安全敏感
+/sign
+
+# 工具链
+.husky/
+.workbuddy/
+.claude/

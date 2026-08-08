@@ -1,0 +1,62 @@
+/******************************************************************************
+ * @file        list.css
+ * @description 列表与卡片样式
+ * @author      B4QAQ
+ * @source      Eternal
+ * @version     Beta1.0
+ * @copyright   2025 B4QAQ@MCNS.
+ * @license     MPL-2.0-only
+ ******************************************************************************/
+
+.card-list {
+  width: 100%;
+  flex: 1;
+  padding: 0 0px;
+  margin-top: 10px;
+}
+
+.card-item {
+  width: 100%;
+  margin-bottom: 12px;
+  background-color: #2a2a2a;
+  border-radius: 25px;
+  padding: 12px 12px;
+}
+
+.card-wrapper {
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+.card-title {
+  font-size: 30px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.card-2title {
+  font-size: 26px;
+  color: #cccccc;
+  margin-left: 5px;
+}
+
+.logo_sty {
+  object-fit: scale-down;
+  height: 40px;
+  width: 40px;
+}
+
+.botton_sty {
+  margin-right: 6px;
+  object-fit: contain;
+  height: 50px;
+  width: 50px;
+}
+@media screen and (shape: circle) {
+  .card-item{
+    width: 90%;
+  }
+}

@@ -1,0 +1,44 @@
+/******************************************************************************
+ * @file        ab.css
+ * @description 关于页面样式
+ * @author      B4QAQ
+ * @source      Eternal
+ * @version     Beta1.0
+ * @copyright   2025 B4QAQ@MCNS.
+ * @license     MPL-2.0-only
+ ******************************************************************************/
+
+.ab-title {
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.ab-text {
+  margin-left: 20px;
+}
+
+.ab-2text {
+  margin-left: 40px;
+  font-size: 26px;
+}
+
+.about {
+  background-color: white;
+  border-radius: 25px;
+  width: 100%;
+  flex-direction: column;
+  padding-top: 40px;
+}
+
+
+.info-box {
+  justify-content: space-between;
+  background-color: #2a2a2a;
+  margin-top: 12px;
+  padding: 16px 16px;
+}
+@media screen and (shape: circle) {
+  .mh{
+    margin-top:40px
+  }
+}

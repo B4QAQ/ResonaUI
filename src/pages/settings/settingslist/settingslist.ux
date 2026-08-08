@@ -1,0 +1,323 @@
+<template>
+  <div class="container-compact">
+    <div class="header-compact">
+      <div if="{{global.Screen.screenShape != 'rect'}}" style="flex-shrink: 0;">
+          <text class="time" style="transform: rotate(-16deg);margin-top:4px">{{ NowTime[0] }}</text>
+          <text class="time" style="transform: rotate(-8deg)">{{ NowTime[1] }}</text>
+          <text class="time" style="margin-top:-6px">:</text>
+          <text class="time" style="transform: rotate(8deg)">{{ NowTime[3] }}</text>
+          <text class="time" style="transform: rotate(16deg);margin-top:4px">{{ NowTime[4] }}</text>
+        </div>
+      <div class="center" >
+        <img src="/common/others/back.png" class="img-sty h24" style="flex-shrink: 0;" />
+        <marquee scrollamount="20" style="color: white;font-size: 32px;" @click="back()">{{title}}</marquee>
+      </div>
+      <text if="{{global.Screen.screenShape == 'rect'}}" class="title" style="flex-shrink: 0;">{{NowTime}}</text>
+    </div>
+    
+    <!-- SettingsList -->
+    <div class='full-area center'>
+      <scroll scroll-y="true" class="full-area center {{scrclass}}" style="color: white;margin-top: 10px;">
+        <div for="showpage" class="center wd100" style="flex-direction: column;">
+            <div if="!$item.type.includes('help')" class="info-box" style="width: 90%;">
+              <marquee class="ab-title" scrollamount="20">{{$item.title}}</marquee>
+              <text if="$item.type != 'info'" class="ab-text center" style="flex-shrink: 0;" @click="ckevent($idx)">{{$item.valList[$item.val]}}</text>
+              <div if="$item.type == 'info'"class="ab-text" style="max-width:50%">
+                <marquee scrollamount="20">{{$item.lore}}</marquee>
+              </div>
+            </div>
+            <div else class="info-box wd" style="flex-direction: column" @click="showitem($idx)">
+              <text class="ab-title">{{$item.title}}</text>
+              <div if="$item.val" for="extractData($item.lore)" class='center' style="width:100%;flex-direction:column">
+                <text class="ab-2text" if="$item.type == 'text'" style="margin: 0px;font-size: 30px;width:100%">{{$item.lore}}</text>
+                <div if="$item.type != 'text'" style="width: 80%;flex-direction:column" class='center'>
+                  <img if="$item.type == 'IMG'" src="{{$item.url}}" style="max-height:180px" class="img-sty"></img>
+                  <qrcode if="$item.type == 'QR'" style="background-color: white;border-radius: 25px;padding: 15px;width:100%" value="{{$item.url}}"/>
+                  <text if="$item.lore" class='ab-2text'>{{$item.lore}}</text>
+                </div>
+              </div>
+            </div>
+            <div style="text-align: left;width: 95%;">
+              <text if="{{!$item.type.includes('help') && $item.type != 'info' && $item.lore != ''}}" class="ab-2text">{{$item.lore}}</text>
+            </div>
+        </div>
+        <div class='bottomzw' />
+    </scroll>
+    </div>
+    <!-- SettingsList -->
+  </div>
+</template>
+
+<script>
+import { getSettings } from '../../../common/js/useful.js'
+import file from '@system.file';
+export default {
+  private: {
+    showpage: null,
+
+    set: [
+      { title: '动画选项', lore: '[!]性能设置 XRING ON \n', type: 'list', val: '0', valList: ['关闭','仅过度']},
+      // ResonaUI自带页面过度动画模块，如果不需要，请删除所有关于uiAdm的部分
+    ],
+    help:[
+      { title: '无法更新?鉴权失败?', lore: '1.检查是否有剩余可用的请求数(设置 -> 授权信息)\n2.重新授权,检查是否有人使用你的信息重复授权(设置 -> 授权信息 -> 刷新授权)', type: 'help', val: false},
+      { title: '部分字符是框框?', lore: 'Vela的字库没那么全,所以部分字符会产生类似[框框]的乱码,是正常现象', type: 'help', val: false},
+      { title: '使用文档', lore: '[QR:https://docs.b4qaq.cn,扫码后查看]', type: 'help', val: false},
+    ],
+    licence:[
+      { title: 'NEORUAA/Vela_input_method', lore: '[QR:https://docs.b4qaq.cn,MIT]', type: 'help', val: false},
+      // 如你所见,ResonaUI的help设置项支持解析自定义格式的文本，并转换到Vela支持的组件，如[QR:这里放URL,这里放简要介绍]或[IMG:这里放URL,这里放简要介绍]
+    ],
+    build:[
+      { title: '编译工具版本', lore: '---', type: 'info',},
+      { title: '编译时间', lore: '---', type: 'info'},
+      { title: 'Nodejs版本', lore: '---', type: 'info'},
+      { title: '编译平台', lore: '---', type: 'info'},
+      { title: '系统架构', lore: '---', type: 'info'},
+    ],
+    scrclass: '',
+    NowTime: '',
+  },
+  async ckevent(index){
+    if(this.showpage[index].type == 'list'){
+      if(this.showpage[index].val < this.showpage[index].valList.length - 1){
+          this.showpage[index].val++
+        }else{
+          this.showpage[index].val = 0
+        }
+    }
+    if(this.showpage[index].type == 'event'){
+      let option = this.showpage[index].title
+      switch(option){
+        case '清除数据':
+          if (this.showpage[index].val == 2) return; // 正在清除中，防止重复点击
+          if (this.showpage[index].val == 0) {
+            global.uiAdm.MessageBox('高危操作,请再次确认');
+            this.showpage[index].val = 1;
+            this.showpage = [...this.showpage];
+            return;
+          }
+          // val == 1，第二次点击确认
+          this.showpage[index].val = 2; // 设置为清除中
+          this.showpage = [...this.showpage];
+          try {
+            await global.storageManager.deleteDir('internal://files/');
+            global.uiAdm.MessageBox('数据已清除');
+            this.route('init');
+          } catch (error) {
+            console.log('[设置] 清除数据异常:', error);
+            this.showpage[index].val = 0;
+            global.uiAdm.MessageBox(`清除数据失败,${error}`);
+          }
+          this.showpage = [...this.showpage];
+          break;
+      }
+    }
+  },
+  showitem(val){
+    this.showpage[val].val = !this.showpage[val].val
+  },
+
+  onInit() {
+    global.uiAdm.registerPage(this.$page.name, this);
+    this.NowTime = global.NowHour + ':' + global.NowMin
+  },
+  onBackPress() {
+    this.back();
+    return true;
+  },
+  onShow(){
+    switch(this.title){
+      case '偏好设置':
+        this.showpage = this.set
+        break;
+      case '应用公告':
+        this.getNotice()
+        break;
+      case '常见问题':
+        this.showpage = this.help
+        break;
+      case '编译信息':
+        this.showpage = this.build
+        this.loadBuildInfo()
+        break;
+      case '开放源代码许可':
+        this.showpage = this.licence
+        break;
+      case '资源下载':
+        this.showpage = this.resfull
+        break;
+    }
+    this.loadSavedSettings();
+  },
+  async getNotice(){
+    if(global.NetworkStatus == 'none') {
+      global.uiAdm.MessageBox('无网络连接，无法获取公告信息');
+      return
+    }
+    const notice = await global.fetchManager.sendFetch('/notice')
+    if(notice.status == 200){
+      if(notice.result.length == 0){
+        global.uiAdm.MessageBox('暂无公告');
+        return
+      }
+      this.showpage = notice.result.map(item => ({
+        title: item.title,
+        lore: item.content,
+        type: 'help',
+        val: false
+      }));
+    }else{
+      global.uiAdm.MessageBox(`[E${notice.status}]获取公告失败,${notice.result}`);
+    }
+  },
+  loadBuildInfo() {
+      file.readText({
+        uri: '/META-INF/build.txt',
+        success: (data) => {
+          const info = {};
+          data.text.trim().split('\n').forEach(line => {
+            const parts = line.split('=');
+            if (parts.length === 2) {
+              info[parts[0].trim()] = parts[1].trim();
+            }
+          });
+          this.showpage = [
+          { title: '编译工具版本', lore: info.toolkit || '未知', type: 'info'},
+          { title: '编译时间', lore: this.formatBuildTime(info.timeStamp), type: 'info'},
+          { title: 'Nodejs版本', lore: info.node || '未知', type: 'info'},
+          { title: '编译平台', lore: info.platform || '未知', type: 'info'},
+          { title: '系统架构', lore: info.arch || '未知', type: 'info'},
+          ];
+        },
+        fail: (data, code) => {
+          console.log(`读取文件失败, code = ${code}, message = ${data}`);
+          this.infoItems = this.infoItems.map(item => ({ ...item, value: '读取失败' }));
+        }
+      });
+    },
+
+    formatBuildTime(isoString) {
+      if (!isoString) return "未知";
+      try {
+        const date = new Date(isoString);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const day = date.getDate().toString().padStart(2, "0");
+        const hours = date.getHours().toString().padStart(2, "0");
+        const minutes = date.getMinutes().toString().padStart(2, "0");
+        const seconds = date.getSeconds().toString().padStart(2, "0");
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      } catch (e) {
+        return "格式错误";
+      }
+    },
+
+  // 加载已保存的设置
+  async loadSavedSettings() {
+    try {
+      const savedSettings = await global.storageManager.getSettings();
+      
+      if (!this.showpage || !Array.isArray(this.showpage)) {
+        return;
+      }
+      
+      for (let i = 0; i < this.showpage.length; i++) {
+        const item = this.showpage[i];
+        if (item && item.type && item.type.includes('list')) {
+          const savedVal = savedSettings[item.title];
+          if (savedVal !== undefined && savedVal !== null) {
+            console.log(`[设置] 恢复设置: ${item.title} = ${savedVal}`);
+            item.val = Number(savedVal);
+          }
+        }
+      }
+      
+      this.showpage = [...this.showpage];
+      
+      console.log('[设置] 设置加载完成');
+    } catch (error) {
+      console.log('[设置] 加载设置异常:', error);
+    }
+  },
+  
+  // 保存当前页面的设置  
+  async saveCurrentSettings() {
+    if (!this.showpage) return;
+    
+    try {
+      const settingsObj = {};
+      
+      if (Array.isArray(this.showpage)) {
+        for (let i = 0; i < this.showpage.length; i++) {
+          const item = this.showpage[i];
+          if (item && item.type && item.type.includes('list')) {
+            settingsObj[item.title] = item.val;
+          }
+        }
+      }
+      
+      await global.storageManager.saveSettings(settingsObj);
+      await getSettings()
+      console.log('[设置] 保存成功', settingsObj);
+    } catch (error) {
+      console.log('[设置] 保存异常:', error);
+    }
+  },
+  onDestroy(){
+    global.uiAdm.unregisterPage(this.$page.name);
+  },
+  onHide(){
+    this.saveCurrentSettings();
+  },
+  extractData(text) {
+    const segments = [];
+    const regex = /\[(?:QR(?:CODE)?:|IMG:)\s*([^,\]]+?)\s*,\s*([^,\]]+?)\s*\]\n?/g;
+    let lastIndex = 0;
+    let match;
+    
+    while (match = regex.exec(text)) {
+      const beforeText = text.substring(lastIndex, match.index);
+      if (beforeText) segments.push({ type: 'text', lore: beforeText });
+      
+      const tagType = match[0].startsWith('[IMG') ? 'IMG' : 'QR';
+      segments.push({ type: tagType, lore: match[2].trim(), url: match[1].trim() });
+      lastIndex = regex.lastIndex;
+    }
+    
+    const afterText = text.substring(lastIndex);
+    if (afterText) segments.push({ type: 'text', lore: afterText });
+    return segments;
+  }
+}
+</script>
+
+<style>
+@import '../../../common/css/ab.css';
+@import '../../../common/css/loading.css';
+
+.ab-text{
+  margin-left:5px;
+  border-radius: 25px;
+  padding-right: 12px;
+  padding-left: 12px;
+  color: 	#9dd9f3;
+  background-color: 	#0c84ff;
+}
+.ab-2text{
+  margin-left: 20px;
+  margin-right: 20px;
+  color: #c2c2c2;
+}
+.ab-button{
+  height: 45px;
+  width: 80px;
+  thumb-color: #0c84ff;
+  track-color:#9dd9f3;
+}
+@media screen and (shape: pill-shaped){
+  .info-box{
+    flex-direction: column;
+  }
+  }
+</style>
