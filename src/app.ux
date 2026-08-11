@@ -33,10 +33,10 @@ export default {
     }
     await storageManager.init() 
     // API Key 检查
-    if (!global.APIKey) {
-      router.replace({ uri: '/pages/init' })
-      return
-    }
+    // if (!global.APIKey) {
+    //   router.replace({ uri: '/pages/init' })
+    //   return
+    // }
     if (global.NetworkStatus === 'none' || !global.fetchAva) {
       return
     }
