@@ -50,6 +50,7 @@
 
 <script>
 import { getSettings } from '../../../common/js/useful.js'
+import { startHandshake } from '../../../common/js/simpleFetch.js'
 import file from '@system.file';
 export default {
   private: {
@@ -58,6 +59,7 @@ export default {
     set: [
       { title: '动画选项', lore: '[!]性能设置 XRING ON \n', type: 'list', val: '0', valList: ['关闭','仅过度']},
       // ResonaUI自带页面过度动画模块，如果不需要，请删除所有关于uiAdm的部分
+      { title: '连接桥接网络', lore: '通过AstroBox插件代理网络请求', type: 'event', val: 0, valList: ['连接']},
     ],
     help:[
       { title: '无法更新?鉴权失败?', lore: '1.检查是否有剩余可用的请求数(设置 -> 授权信息)\n2.重新授权,检查是否有人使用你的信息重复授权(设置 -> 授权信息 -> 刷新授权)', type: 'help', val: false},
@@ -110,6 +112,10 @@ export default {
             global.uiAdm.MessageBox(`清除数据失败,${error}`);
           }
           this.showpage = [...this.showpage];
+          break;
+        case '连接桥接网络':
+          global.uiAdm.MessageBox('正在发起握手...')
+          await startHandshake()
           break;
       }
     }

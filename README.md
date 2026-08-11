@@ -86,6 +86,8 @@ ResonaUI-Example/
 │   │   │   ├── uiAdm.js   # UI 管理（动画、页面池）
 │   │   │   ├── storage.js # 数据存储
 │   │   │   ├── fetch.js   # 网络请求
+│   │   │   ├── interconnect.js # 设备互联（与手机 App 通信）
+│   │   │   ├── simpleFetch.js # 桥接网络（经手机代理 HTTP/SSE）
 │   │   │   └── useful.js  # 工具函数
 │   │   └── others/        # 静态资源
 │   ├── components/        # 可复用组件
@@ -149,6 +151,16 @@ set: [
 ]
 ```
 
+### 桥接网络（SimpleFetch）
+
+部分 Vela 设备（如小米手环系列）不支持 `@system.fetch`，无法直接联网。ResonaUI 已集成 **SimpleFetch**，通过互联（interconnect）通道把网络请求代理给手机端 App 执行，让这些设备同样具备联网能力。
+
+- **零业务改动**：握手成功后进入桥接模式（`global.NetworkStatus = 'bridge'`），[fetch.js](src/common/js/fetch.js) 自动改走桥接，调用 `global.fetchManager.sendFetch()` 的方式完全不变；原生支持 fetch 的设备则继续走原生 fetch。
+- **完整能力**：支持普通 HTTP 请求、大数据分片传输，以及 SSE 流式响应。
+- **自动保活**：握手后由快应用每 10s 发起心跳，超时或断连自动回退并刷新网络状态；也可在「偏好设置 → 连接桥接网络」手动发起握手。
+
+手机端配套的 AstroBox 插件与接入文档见 [B4QAQ/SimpleFetch-AstroBoxV2-Plugins](https://github.com/B4QAQ/SimpleFetch-AstroBoxV2-Plugins)。
+
 ## 🔨 构建部署
 
 ### 开发构建
@@ -192,6 +204,7 @@ console.log(info.product)        // 设备代号
 
 - [XiaomiVela 开发文档](https://iot.mi.com/vela/quickapp/zh/guide/)
 - [VelaDocs 本地文档](./VelaDocs/)（项目内置）
+- [SimpleFetch AstroBox 插件与文档](https://github.com/B4QAQ/SimpleFetch-AstroBoxV2-Plugins)
 - [AGENTS.md](./AGENTS.md) - AI 辅助开发规范
 
 ---

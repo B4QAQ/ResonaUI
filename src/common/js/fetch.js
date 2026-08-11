@@ -3,12 +3,13 @@
  * @description 网络请求模块（仅MingChenAPI）
  * @author      B4QAQ
  * @source      Eternal
- * @version     4.0
+ * @version     5.0
  * @copyright   2026 B4QAQ@MCNS.
  * @license     AGPL-3.0-only
  ******************************************************************************/
 
 import fetch from '@system.fetch'
+import * as simpleFetch from './simpleFetch.js'
 
 
 /**
@@ -40,8 +41,11 @@ export async function sendFetch(url, isapi = true, parameter = {}) {
 
   console.log('[>] 请求配置:', requestConfig)
 
+  // 桥接模式走SimpleFetch，否则走原生fetch
+  const fetcher = global.NetworkStatus === 'bridge' ? simpleFetch : fetch
+
   try {
-    const response = await fetch.fetch(requestConfig)
+    const response = await fetcher.fetch(requestConfig)
     if (response.data.code !== 200) {
       console.log(`[-] 请求失败: ${url}`, response)
       return {

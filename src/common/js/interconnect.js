@@ -10,6 +10,7 @@
 
 import interconnect from '@system.interconnect'
 import { getDeviceInfo, getSettings } from './useful.js'
+import * as simpleFetch from './simpleFetch.js'
 
 /**
  * 初始化设备通信
@@ -28,6 +29,9 @@ export function initInterconnect() {
     global.interconnectInstance.onclose = (data) => {
       console.log('[设备通信] 连接已关闭, reason:', data.data, 'code:', data.code)
       global.InterconnectStatus = 2
+      if (simpleFetch.isBridgeActive()) {
+        simpleFetch.deactivateBridge()
+      }
     }
 
     // 注册连接错误回调
@@ -157,8 +161,12 @@ export function sendInterconnectData(data) {
 export async function handleInterconnectMessage(msg) {
   const { type, status, data } = msg
 
-  // 如果有status且不为OK，直接显示错误
+  // 如果有status且不为OK，检查是否为SimpleFetch消息
   if (status && status !== 'OK') {
+    if (type && type.startsWith('SF_')) {
+      simpleFetch.handleMessage(msg)
+      return
+    }
     console.log('[设备通信] 收到错误状态:', status)
     global.uiAdm.MessageBox('[E]' + status)
     return
@@ -215,6 +223,11 @@ export async function handleInterconnectMessage(msg) {
       }
 
       default:
+        // SimpleFetch消息
+        if (type && type.startsWith('SF_')) {
+          simpleFetch.handleMessage(msg)
+          break
+        }
         console.log('[设备通信] 未知的消息类型:', type)
         global.uiAdm.MessageBox('[W]收到未知消息类型:' + (type || '未知'))
     }

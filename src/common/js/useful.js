@@ -45,13 +45,23 @@ export async function getDeviceInfo() {
 
     await new Promise((resolve) => {
       network.getType({
-        success: (data) => { Object.assign(info, data); resolve() },
+        success: (data) => {
+          if (global.NetworkStatus === 'bridge') {
+            info.type = 'bridge'
+            global.fetchAva = true
+          } else {
+            Object.assign(info, data)
+          }
+          resolve()
+        },
         fail: () => resolve()
       })
     })
 
     Object.assign(info, app.getInfo())
-    global.fetchAva = !!app.canIUse('@system.fetch')
+    if (global.NetworkStatus !== 'bridge') {
+      global.fetchAva = !!app.canIUse('@system.fetch')
+    }
     global.Screen = {
       screenWidth: info.screenWidth,
       screenHeight: info.screenHeight,
