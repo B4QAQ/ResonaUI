@@ -2,15 +2,46 @@
  * @file        interconnect.js
  * @description 设备通信模块 - 处理与手机App的数据交互
  * @author      B4QAQ
- * @source      Eternal
+ * @source      ResonaUI
  * @version     1.0
  * @copyright   2026 B4QAQ@MCNS.
- * @license     MPL-2.0-only
+ * @license     AGPL-3.0-only
  ******************************************************************************/
 
 import interconnect from '@system.interconnect'
+import file from '@system.file'
+import crypto from '@system.crypto'
 import { getDeviceInfo, getSettings } from './useful.js'
 import * as simpleFetch from './simpleFetch.js'
+
+/**
+ * 确保 uri 的父目录存在（已存在时忽略错误）
+ */
+function ensureDir(uri) {
+  const slash = uri.lastIndexOf('/')
+  if (slash < 0) return Promise.resolve()
+  const dir = uri.substring(0, slash)
+  return new Promise((resolve) => {
+    file.mkdir({ uri: dir, success: resolve, fail: () => resolve() })
+  })
+}
+
+/**
+ * 将通过互联传入的数据解码为 Uint8Array
+ * 互联走 JSON，二进制以 base64 字符串传输；兼容 data URI 和已是 Uint8Array 的情况
+ * 注意：file.writeArrayBuffer 的 buffer 参数要求 Uint8Array（非 ArrayBuffer）
+ */
+function decodeBuffer(data) {
+  if (typeof data !== 'string') return data
+  let str = data
+  const comma = str.indexOf(',')
+  if (str.startsWith('data:') && comma >= 0) str = str.substring(comma + 1)
+  const binary = crypto.atob(str)
+  const len = binary.length
+  const bytes = new Uint8Array(len)
+  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i)
+  return bytes
+}
 
 /**
  * 初始化设备通信
@@ -198,19 +229,28 @@ export async function handleInterconnectMessage(msg) {
         break
       }
       case 'UPLOAD_FILE': {
-        const file = await import('@system.file')
         try {
+          if (!data?.uri) throw new Error('缺少 uri')
+          if (data?.data === undefined || data?.data === null) throw new Error('缺少 data')
+          const buffer = decodeBuffer(data.data)
+          await ensureDir(data.uri)
           await new Promise((resolve, reject) => {
-            file.writeArrayBuffer({ uri: data?.uri, buffer: data?.data, append: data?.append, position: data?.position, success: resolve, fail: (_, code) => reject(`写入失败: ${code}`) })
+            file.writeArrayBuffer({
+              uri: data.uri,
+              buffer: buffer,
+              append: data.append,
+              position: data.position,
+              success: resolve,
+              fail: (d, code) => reject(`写入失败: ${code}`)
+            })
           })
-          sendInterconnectData({ type: 'UPLOAD_FILE_DONE', status: 'OK', data: { uri: data?.uri } })
+          sendInterconnectData({ type: 'UPLOAD_FILE_DONE', status: 'OK', data: { uri: data.uri } })
         } catch (e) {
           sendInterconnectData({ type: 'UPLOAD_FILE_DONE', status: e.toString(), data: { uri: data?.uri } })
         }
         break
       }
       case 'DEL_FILE': {
-        const file = await import('@system.file')
         try {
           await new Promise((resolve, reject) => {
             file.delete({ uri: data?.uri, success: resolve, fail: (_, code) => reject(`删除失败: ${code}`) })
