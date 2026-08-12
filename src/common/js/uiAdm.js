@@ -2,7 +2,7 @@
  * @file        uiAdm.js
  * @description 应用UI管理JS
  * @author      B4QAQ
- * @source      Eternal
+ * @source      ResonaUI
  * @version     1.5
  * @copyright   2026 B4QAQ@MCNS.
  * @license     AGPL-3.0-only

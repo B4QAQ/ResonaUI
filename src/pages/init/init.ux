@@ -98,7 +98,7 @@ WARNING:此页仅适配使用MingChengAPI验证服务进行的快应用激活操
       fromset: false,
       addinfo: null,
       buildURL: null,
-      // 如果你不使用 Eternal 作为验证，请填入你自己应用的公钥和应用名
+      // 如果你不使用 ResonaUI 作为验证，请填入你自己应用的公钥和应用名
       pubKey: `替换为您自己的publicKey（xxxx）`,
       pagetitle: '请先同意协议',
       licence: `请替换为您自己的协议[xxxx]`,

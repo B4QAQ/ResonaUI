@@ -2,10 +2,10 @@
  * @file        simpleFetch.js
  * @description SimpleFetch模块 - 通过互联通道代理网络请求
  * @author      B4QAQ
- * @source      Eternal
+ * @source      ResonaUI
  * @version     1.1
  * @copyright   2026 B4QAQ@MCNS.
- * @license     MPL-2.0-only
+ * @license     AGPL-3.0-only
  ******************************************************************************/
 
 import { sendInterconnectData } from './interconnect.js'

@@ -2,7 +2,7 @@
  * @file        storage.js
  * @description 数据存储与管理模块
  * @author      B4QAQ
- * @source      Eternal
+ * @source      ResonaUI
  * @version     6.0
  * @copyright   2026 B4QAQ@MCNS.
  * @license     AGPL-3.0-only

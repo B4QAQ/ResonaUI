@@ -2,7 +2,7 @@
  * @file        fetch.js
  * @description 网络请求模块（仅MingChenAPI）
  * @author      B4QAQ
- * @source      Eternal
+ * @source      ResonaUI
  * @version     5.0
  * @copyright   2026 B4QAQ@MCNS.
  * @license     AGPL-3.0-only

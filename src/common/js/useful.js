@@ -2,7 +2,7 @@
  * @file        useful.js
  * @description 通用工具函数模块
  * @author      B4QAQ
- * @source      Eternal
+ * @source      ResonaUI
  * @version     1.2
  * @copyright   2026 B4QAQ@MCNS.
  * @license     AGPL-3.0-only
