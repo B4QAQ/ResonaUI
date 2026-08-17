@@ -14,6 +14,38 @@ import crypto from '@system.crypto'
 import { getDeviceInfo, getSettings } from './useful.js'
 import * as simpleFetch from './simpleFetch.js'
 
+const BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+let base64Table = null
+
+/**
+ * 查表解码 base64，直接产出 Uint8Array（不经过二进制字符串，避免高字节被编码污染）
+ */
+function decodeBase64(base64) {
+  if (!base64Table) {
+    const table = new Int16Array(256)
+    table.fill(-1)
+    for (let i = 0; i < BASE64_CHARS.length; i++) table[BASE64_CHARS.charCodeAt(i)] = i
+    base64Table = table
+  }
+  const input = String(base64).replace(/[^A-Za-z0-9+/=]/g, '')
+  const len = input.length
+  if (len === 0) return new Uint8Array(0)
+  const padding = input[len - 1] === '=' ? (input[len - 2] === '=' ? 2 : 1) : 0
+  const output = new Uint8Array((len >> 2) * 3 - padding)
+  let out = 0
+  for (let i = 0; i < len; i += 4) {
+    const c1 = base64Table[input.charCodeAt(i)]
+    const c2 = base64Table[input.charCodeAt(i + 1)]
+    const c3 = input.charCodeAt(i + 2) === 61 ? 0 : base64Table[input.charCodeAt(i + 2)]
+    const c4 = input.charCodeAt(i + 3) === 61 ? 0 : base64Table[input.charCodeAt(i + 3)]
+    const v = (c1 << 18) | (c2 << 12) | (c3 << 6) | c4
+    output[out++] = (v >> 16) & 0xff
+    if (out < output.length) output[out++] = (v >> 8) & 0xff
+    if (out < output.length) output[out++] = v & 0xff
+  }
+  return output
+}
+
 /**
  * 确保 uri 的父目录存在（已存在时忽略错误）
  */
@@ -231,13 +263,13 @@ export async function handleInterconnectMessage(msg) {
       case 'UPLOAD_FILE': {
         try {
           if (!data?.uri) throw new Error('缺少 uri')
-          if (data?.data === undefined || data?.data === null) throw new Error('缺少 data')
-          const buffer = decodeBuffer(data.data)
+          if (!data?.data) throw new Error('缺少 data')
+          const bytes = decodeBase64(data.data)
           await ensureDir(data.uri)
           await new Promise((resolve, reject) => {
             file.writeArrayBuffer({
               uri: data.uri,
-              buffer: buffer,
+              buffer: bytes,
               append: data.append,
               position: data.position,
               success: resolve,
